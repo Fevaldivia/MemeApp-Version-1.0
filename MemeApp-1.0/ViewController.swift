@@ -16,6 +16,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
+    
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [String : Any]){
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController){
+    
+    }
 
 
     @IBAction func pickImage(_ sender: Any) {
