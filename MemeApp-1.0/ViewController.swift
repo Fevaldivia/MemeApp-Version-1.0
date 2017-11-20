@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var imageContent: UIImageView!
     
@@ -16,10 +16,20 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
+    
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [String : Any]){
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController){
+    
+    }
 
 
     @IBAction func pickImage(_ sender: Any) {
         let chooseImage = UIImagePickerController()
+        
+        chooseImage.delegate = self
         
         self.present(chooseImage, animated: true, completion: nil)
     }
