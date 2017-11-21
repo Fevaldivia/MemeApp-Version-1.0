@@ -9,14 +9,25 @@
 import UIKit
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-
+    // MARK: IBOutlets
     @IBOutlet weak var imageContent: UIImageView!
     @IBOutlet weak var cameraButton: UIButton!
+    
+    
+    @IBOutlet weak var topText: UITextField!
+    @IBOutlet weak var bottomText: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
          cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        
+        // Setting up the text for the textfields
+        topText.text = "TOP"
+        bottomText.text = "BOTTOM"
+        // set text alignment
+        topText.textAlignment = .center
+        bottomText.textAlignment = .center
     }
     
 
