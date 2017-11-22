@@ -28,6 +28,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         // set text alignment
         topText.textAlignment = .center
         bottomText.textAlignment = .center
+        // setting attributes
+        let memeTextAttributes:[String:Any] = [
+            NSStrokeColorAttributeName: UIColor.black,
+            NSForegroundColorAttributeName: UIColor.white,
+            NSFontAttributeName: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSStrokeWidthAttributeName: 2.0 ]
+        
+        // setting the attributes to the textfields
+        topText.defaultTextAttributes = memeTextAttributes
+        bottomText.defaultTextAttributes = memeTextAttributes
     }
     
 
