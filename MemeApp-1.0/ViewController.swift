@@ -11,21 +11,22 @@ import UIKit
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     // MARK: IBOutlets
     @IBOutlet weak var imageContent: UIImageView!
-    @IBOutlet weak var cameraButton: UIButton!
+    
+    @IBOutlet weak var cameraButton: UIBarButtonItem!
     
     
     @IBOutlet weak var topText: UITextField!
     @IBOutlet weak var bottomText: UITextField!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
-        
-        // Setting up the text for the textfields
-        topText.text = "TOP"
-        bottomText.text = "BOTTOM"
-        
+    @IBOutlet weak var navBar: UINavigationBar!
+    @IBOutlet weak var toolBard: UIToolbar!
+    
+    
+    @IBOutlet weak var shareButton: UIBarButtonItem!
+    
+    var memes = [Meme]()
+    
+    func configure(textField:UITextField, withText text: String) {
         // setting attributes
         let memeTextAttributes:[String:Any] = [
             NSStrokeColorAttributeName: UIColor.black,
@@ -34,21 +35,33 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             NSStrokeWidthAttributeName: -4.0 ]
         
         // setting the attributes to the textfields
-        topText.defaultTextAttributes = memeTextAttributes
-        bottomText.defaultTextAttributes = memeTextAttributes
+        textField.defaultTextAttributes = memeTextAttributes
+        
+        // textField text
+        textField.text = text
         
         // set text alignment
-        topText.textAlignment = .center
-        bottomText.textAlignment = .center
+        textField.textAlignment = .center
         
         // delegate for textField
-        topText.delegate = self
-        bottomText.delegate = self
+        textField.delegate = self
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        
+        configure(textField: topText, withText: "TOP")
+        configure(textField: bottomText, withText: "BOTTOM")
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         subscribeToKeyboardNotifications()
+        // share button is enable
+        shareButton.isEnabled = (imageContent.image != nil)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -65,21 +78,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     }
     
+    // MARK: Present Picker function
+    func presentPicker(withSource: UIImagePickerControllerSourceType){
+        // configure and present image picker with source type
+        let presentImagePicker = UIImagePickerController()
+        presentImagePicker.delegate = self
+        presentImagePicker.sourceType = withSource
+        self.present(presentImagePicker, animated: true, completion: nil)
+    }
+    
     // MARK: Function to launch photo library
     @IBAction func pickImage(_ sender: Any) {
-        let chooseImage = UIImagePickerController()
-        chooseImage.delegate = self
-        chooseImage.sourceType = .photoLibrary
-        self.present(chooseImage, animated: true, completion: nil)
+        presentPicker(withSource: .photoLibrary)
     }
     
     // MARK: Function to take a picture
     @IBAction func takePicture(_ sender: Any) {
-        let pictureTaken = UIImagePickerController()
-        pictureTaken.delegate = self
-        pictureTaken.sourceType = .camera
-        self.present(pictureTaken, animated: true, completion: nil)
+        presentPicker(withSource: .camera)
     }
+    
     
     // MARK: Function to pick and assing a photo from library
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]){
@@ -120,7 +137,53 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
     }
+    // MARK: Hide Keyboard Function
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
     
-
+    
+    func save() {
+        // Create the meme
+        let meme = Meme(topText: topText.text!, bottomText: bottomText.text!, originalImage: imageContent.image!, memedImage: generateMemedImage())
+    
+        // Add it to the memes array in the Application Delegate
+        let object = UIApplication.shared.delegate
+        let appDelegate = object as! AppDelegate
+        appDelegate.memes.append(meme)
+    }
+    
+    
+    func generateMemedImage() -> UIImage {
+        // Render view to an image
+        UIGraphicsBeginImageContext(self.view.frame.size)
+        view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
+        let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        return memedImage
+    }
+    
+    
+    // MARK: Share Meme
+    @IBAction func shareMeme(_ sender: Any) {
+        let memeToShare = generateMemedImage()
+        let activityViewController = UIActivityViewController(activityItems: [memeToShare], applicationActivities: nil)
+        self.present(activityViewController, animated: true, completion: nil)
+        
+        activityViewController.completionWithItemsHandler = {
+            (activity, success, items, error) in
+            if(success && error == nil) {
+                self.save()
+                self.dismiss(animated: true, completion: nil)
+            } else if (error != nil){
+                print("ERRORRRRR !")
+            }
+        }
+    }
+    
+    
+    
 }
 
