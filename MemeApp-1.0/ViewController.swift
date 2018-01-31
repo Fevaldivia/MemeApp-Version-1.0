@@ -21,6 +21,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var toolBard: UIToolbar!
     
+    @IBOutlet weak var albumButton: UIBarButtonItem!
     
     @IBOutlet weak var shareButton: UIBarButtonItem!
     
@@ -69,6 +70,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         unsubscribeFromKeyboardNotifications()
     }
     
+    // Cancel button action
+    @IBAction func cancelButton(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     // MARK: Function to clean text
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField.text == "TOP" {
@@ -77,6 +83,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             bottomText.text = ""
         }
     }
+
     
     // MARK: Present Picker function
     func presentPicker(withSource: UIImagePickerControllerSourceType){
@@ -154,13 +161,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         appDelegate.memes.append(meme)
     }
     
+    func navAndToolBarHide(_ hide: Bool){
+        self.navigationController?.setNavigationBarHidden(hide, animated: hide)
+        toolBard.isHidden = hide
+        navBar.isHidden = hide
+        albumButton.accessibilityElementsHidden = hide
+        cameraButton.accessibilityElementsHidden = hide
+    }
+    
     
     func generateMemedImage() -> UIImage {
         // Render view to an image
+        navAndToolBarHide(true)
+        
         UIGraphicsBeginImageContext(self.view.frame.size)
         view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
         let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
+        
+         navAndToolBarHide(false)
         
         return memedImage
     }
